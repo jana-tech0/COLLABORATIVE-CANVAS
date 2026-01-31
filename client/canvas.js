@@ -7,6 +7,10 @@ canvas.height = window.innerHeight;
 
 // stage of the drawing process
 let isDrawing = false;
+let lastPos = null;
+
+const strokes = [];
+
 let lastx = 0;
 let lasty = 0;
 
@@ -16,26 +20,41 @@ let brushSize = 5;
 // when we pressed the mouse.
 canvas.addEventListener('mousedown', (e) => {
   isDrawing = true;
-  lastx = e.clientX;
-  lasty = e.clientY;
+  lastPos = { x: e.clientX, y: e.clientY };
 });
 
 // when we moved the mouse.
 canvas.addEventListener('mousemove', (e) => {
   if (!isDrawing) return;
 
-  ctx.strokeStyle = brushColor;
-  ctx.lineWidth = brushSize;
+  const currentPos = { x: e.clientX, y: e.clientY };
+  // create the stroke object.
+  const stroke = {
+    start: lastPos,
+    end: currentPos,
+    color: brushColor,
+    width: brushSize,
+    userId: 'local-user',
+    timestamp: Date.now(),
+  };
+
+  // call the stoke function to draw.
+  strokes.push(stroke);
+  drawStroke(stroke);
+  lastPos = currentPos;
+});
+
+// function to draw
+function drawStroke(stroke) {
+  ctx.strokeStyle = stroke.color;
+  ctx.lineWidth = stroke.width;
   ctx.lineCap = 'round';
 
   ctx.beginPath();
-  ctx.moveTo(lastx, lasty);
-  ctx.lineTo(e.clientX, e.clientY);
+  ctx.moveTo(stroke.start.x, stroke.start.y);
+  ctx.lineTo(stroke.end.x, stroke.end.y);
   ctx.stroke();
-
-  lastx = e.clientX;
-  lasty = e.clientY;
-});
+}
 
 //when we released the mouse.
 canvas.addEventListener('mouseup', () => {
