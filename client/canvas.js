@@ -17,11 +17,28 @@ let lasty = 0;
 let brushColor = 'black';
 let brushSize = 5;
 
+const socket = new WebSocket('ws://localhost:3000');
+
+socket.onopen = () => {
+  console.log('coneected to the websocket server');
+  socket.send('hello server from client');
+};
+
+socket.onmessage = (event) => {
+  console.log('message from server:', event.data);
+};
+
+socket.onclose = () => {
+  console.log('disconnected from server');
+};
+
 // when we pressed the mouse.
 canvas.addEventListener('mousedown', (e) => {
   isDrawing = true;
   lastPos = { x: e.clientX, y: e.clientY };
 });
+
+
 
 // when we moved the mouse.
 canvas.addEventListener('mousemove', (e) => {
