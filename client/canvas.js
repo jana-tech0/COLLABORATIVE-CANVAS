@@ -28,6 +28,10 @@ socket.onmessage = (event) => {
   if (data.type == 'STROKE') {
     drawStroke(data.stroke);
   }
+
+  if (data.type === 'USER_JOINED') {
+    console.log('Users online:', data.users);
+  }
 };
 
 socket.onclose = () => {
