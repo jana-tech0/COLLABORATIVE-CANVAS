@@ -21,11 +21,13 @@ const socket = new WebSocket('ws://localhost:3000');
 
 socket.onopen = () => {
   console.log('coneected to the websocket server');
-  socket.send('hello server from client');
 };
 
 socket.onmessage = (event) => {
-  console.log('message from server:', event.data);
+  const data = JSON.parse(event.data);
+  if (data.type == 'STROKE') {
+    drawStroke(data.stroke);
+  }
 };
 
 socket.onclose = () => {
@@ -37,8 +39,6 @@ canvas.addEventListener('mousedown', (e) => {
   isDrawing = true;
   lastPos = { x: e.clientX, y: e.clientY };
 });
-
-
 
 // when we moved the mouse.
 canvas.addEventListener('mousemove', (e) => {
@@ -58,6 +58,13 @@ canvas.addEventListener('mousemove', (e) => {
   // call the stoke function to draw.
   strokes.push(stroke);
   drawStroke(stroke);
+
+  socket.send(
+    JSON.stringify({
+      type: 'STROKE',
+      stroke,
+    })
+  );
   lastPos = currentPos;
 });
 
@@ -71,6 +78,8 @@ function drawStroke(stroke) {
   ctx.moveTo(stroke.start.x, stroke.start.y);
   ctx.lineTo(stroke.end.x, stroke.end.y);
   ctx.stroke();
+
+  console.log('this is janardhan');
 }
 
 //when we released the mouse.
